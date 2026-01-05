@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper=false, onlyExplicitlyIncluded=true)
+@NoArgsConstructor
 @Table(schema = "public", name = "\"user\"")
 public class User {
     @Id
