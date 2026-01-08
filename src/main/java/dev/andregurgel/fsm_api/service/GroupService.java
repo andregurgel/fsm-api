@@ -4,6 +4,7 @@ import dev.andregurgel.fsm_api.controller.dto.GroupInserRecord;
 import dev.andregurgel.fsm_api.model.Group;
 import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.repository.GroupRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,11 @@ public class GroupService {
                         UserService userService) {
         this.groupRepository = groupRepository;
         this.userService = userService;
+    }
+
+    public Group findById(Long groupId) {
+        return groupRepository.findById(groupId)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public List<Group> findAllFromUser(Long userId) {
@@ -42,6 +48,12 @@ public class GroupService {
         group.getUsers().add(owner);
 
         return groupRepository.save(group);
+    }
+
+    @Transactional
+    public void addUserToGroup(Group group, User user) {
+        group.getUsers().add(user);
+        groupRepository.save(group);
     }
 
     private void verifyIfUserCanCreateGroup(Long ownerId) {

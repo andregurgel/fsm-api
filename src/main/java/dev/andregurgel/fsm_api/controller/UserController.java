@@ -9,6 +9,7 @@ import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,11 +51,13 @@ public class UserController implements PageController<User, UserFilter> {
         return ResponseEntity.ok(userService.patch(id, userPatchRecord));
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/activate/{id}")
     public void activate(@PathVariable Long id) {
         userService.activate(id);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/deactivate/{id}")
     public void deactivate(@PathVariable Long id) {
         userService.deactivate(id);

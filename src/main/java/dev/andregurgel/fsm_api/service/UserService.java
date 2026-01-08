@@ -51,7 +51,7 @@ public class UserService {
             user.setName(userInsertRecord.name());
             user.setEmail(userInsertRecord.email());
             user.setPassword(userInsertRecord.password());
-            user.setPhone(userInsertRecord.phone());
+            user.setPhone(userInsertRecord.phone()); // TODO: Include bCrypt when implementing security.
             user.setActive(true);
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
