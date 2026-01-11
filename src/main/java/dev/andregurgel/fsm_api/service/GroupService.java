@@ -1,14 +1,15 @@
 package dev.andregurgel.fsm_api.service;
 
+import dev.andregurgel.fsm_api.commons.exception.ApplicationException;
 import dev.andregurgel.fsm_api.controller.dto.GroupInserRecord;
 import dev.andregurgel.fsm_api.model.Group;
 import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.repository.GroupRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GroupService {
@@ -17,15 +18,23 @@ public class GroupService {
 
     private final UserService userService;
 
+    private final MessageService messageService;
+
     public GroupService(GroupRepository groupRepository,
-                        UserService userService) {
+                        UserService userService,
+                        MessageService messageService) {
         this.groupRepository = groupRepository;
         this.userService = userService;
+        this.messageService = messageService;
     }
 
     public Group findById(Long groupId) {
-        return groupRepository.findById(groupId)
-                .orElseThrow(EntityNotFoundException::new);
+        Optional<Group> groupOpt = groupRepository.findById(groupId);
+        if (groupOpt.isEmpty()) {
+            throw new ApplicationException(messageService.get("group.creation.limit.exceeded.exception"));
+        }
+
+        return groupOpt.get();
     }
 
     public List<Group> findAllFromUser(Long userId) {
@@ -59,7 +68,7 @@ public class GroupService {
     private void verifyIfUserCanCreateGroup(Long ownerId) {
         List<Group> groups = groupRepository.findAllByOwner_Id(ownerId);
         if (groups.size() == 2) {
-            throw new RuntimeException("Você atingiu o limite de 2 grupos criados.");
+            throw new RuntimeException(messageService.get("group.already.created.exception", ownerId));
         }
     }
 }

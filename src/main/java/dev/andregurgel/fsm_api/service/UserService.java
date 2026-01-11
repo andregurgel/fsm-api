@@ -1,5 +1,6 @@
 package dev.andregurgel.fsm_api.service;
 
+import dev.andregurgel.fsm_api.commons.exception.ApplicationException;
 import dev.andregurgel.fsm_api.controller.dto.UserInsertRecord;
 import dev.andregurgel.fsm_api.controller.dto.UserPatchRecord;
 import dev.andregurgel.fsm_api.controller.filter.UserFilter;
@@ -7,14 +8,12 @@ import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.repository.UserRepository;
 import dev.andregurgel.fsm_api.repository.spec.UserSpecification;
 import dev.andregurgel.fsm_api.service.mapper.UserMapper;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,19 +21,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    private final MessageService messageService;
+
     public UserService(UserRepository userRepository,
-                       UserMapper userMapper) {
+                       UserMapper userMapper, MessageService messageService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.messageService = messageService;
     }
 
     public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
-    }
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) {
+            throw new ApplicationException(messageService.get("user.not.found.exception", id));
+        }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+        return userOpt.get();
     }
 
     public Page<User> findAllPageable(Pageable pageable) {
@@ -46,29 +48,19 @@ public class UserService {
     }
 
     public User insert(UserInsertRecord userInsertRecord) {
-        try {
-            User user = new User();
-            user.setName(userInsertRecord.name());
-            user.setEmail(userInsertRecord.email());
-            user.setPassword(userInsertRecord.password());
-            user.setPhone(userInsertRecord.phone()); // TODO: Include bCrypt when implementing security.
-            user.setActive(true);
-            return userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException(e);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        User user = new User();
+        user.setName(userInsertRecord.name());
+        user.setEmail(userInsertRecord.email());
+        user.setPassword(userInsertRecord.password());
+        user.setPhone(userInsertRecord.phone()); // TODO: Include bCrypt when implementing security.
+        user.setActive(true);
+        return userRepository.save(user);
     }
 
     public User patch(Long id, UserPatchRecord userPatchRecord) {
-        try {
-            User user = findById(id);
-            userMapper.patch(userPatchRecord, user);
-            return userRepository.save(user);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        User user = findById(id);
+        userMapper.patch(userPatchRecord, user);
+        return userRepository.save(user);
     }
 
     public void activate(Long id) {

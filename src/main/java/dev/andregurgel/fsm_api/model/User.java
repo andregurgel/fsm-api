@@ -2,6 +2,7 @@ package dev.andregurgel.fsm_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ public class User {
     @NotNull
     private String name;
 
+    @Email
     @NotNull
     private String email;
 

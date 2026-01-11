@@ -13,5 +13,5 @@ CREATE TABLE public.group_invite
             REFERENCES public."group" (id)
             ON UPDATE CASCADE ON DELETE CASCADE,
 
-    CONSTRAINT uk_group_invite_hash UNIQUE (hash)
+    CONSTRAINT group_invite_hash_uk UNIQUE (hash)
 );

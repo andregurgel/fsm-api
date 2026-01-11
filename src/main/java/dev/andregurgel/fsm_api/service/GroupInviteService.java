@@ -1,5 +1,6 @@
 package dev.andregurgel.fsm_api.service;
 
+import dev.andregurgel.fsm_api.commons.exception.ApplicationException;
 import dev.andregurgel.fsm_api.controller.dto.GroupInviteInsertRecord;
 import dev.andregurgel.fsm_api.controller.filter.GroupInviteFilter;
 import dev.andregurgel.fsm_api.model.Group;
@@ -7,13 +8,13 @@ import dev.andregurgel.fsm_api.model.GroupInvite;
 import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.repository.GroupInviteRepository;
 import dev.andregurgel.fsm_api.repository.spec.GroupInviteSpecification;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,17 +26,25 @@ public class GroupInviteService {
 
     private final UserService userService;
 
+    private final MessageService messageService;
+
     public GroupInviteService(GroupInviteRepository groupInviteRepository,
                               GroupService groupService,
-                              UserService userService) {
+                              UserService userService,
+                              MessageService messageService) {
         this.groupInviteRepository = groupInviteRepository;
         this.groupService = groupService;
         this.userService = userService;
+        this.messageService = messageService;
     }
 
     public GroupInvite findByHash(UUID hash) {
-        return groupInviteRepository.findByHash(hash)
-                .orElseThrow(EntityNotFoundException::new);
+        Optional<GroupInvite> groupInviteOpt = groupInviteRepository.findByHash(hash);
+        if (groupInviteOpt.isEmpty()) {
+            throw new ApplicationException(messageService.get("groupInvite.not.found.exception", hash));
+        }
+
+        return groupInviteOpt.get();
     }
 
     public Page<GroupInvite> findAllPageable(Pageable pageable) {
@@ -44,7 +53,7 @@ public class GroupInviteService {
 
     public Page<GroupInvite> findAllPageableFiltered(Pageable pageable, GroupInviteFilter filter) {
         if (filter.getGroupId() == null) {
-            throw new RuntimeException("Informe o grupo que deseja visualizar os convites.");
+            throw new ApplicationException(messageService.get("groupInvite.group.filter.not.informed.exception"));
         }
 
         return groupInviteRepository.findAll(GroupInviteSpecification.filter(filter), pageable);
@@ -83,17 +92,17 @@ public class GroupInviteService {
     private void checkExpiration(LocalDateTime expiresAt) {
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(expiresAt)) {
-            throw new RuntimeException("O convite está expirado, solicite outro ao responsável do grupo.");
+            throw new ApplicationException(messageService.get("groupInvite.expired.exception"));
         }
     }
 
     private void checkIfTheUserHasAnyTypeOfLinkWithTheGroup(Group group, User user) {
         if (group.getOwner().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não pode aceitar o convite desse grupo, pois já é dono do grupo.");
+            throw new ApplicationException(messageService.get("groupInvite..user.already.owner.exception"));
         }
 
         if (group.getUsers().contains(user)) {
-            throw new RuntimeException("Você não pode aceitar o convite desse grupo, pois já faz parte dele.");
+            throw new ApplicationException(messageService.get("groupInvite..user.already.member.exception"));
         }
     }
 }

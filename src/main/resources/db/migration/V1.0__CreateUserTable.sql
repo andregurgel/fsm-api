@@ -10,7 +10,7 @@ CREATE TABLE "user"
     created_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT user_uk UNIQUE (email)
+    CONSTRAINT user_email_uk UNIQUE (email)
 );
 
 INSERT INTO public."user" (email, password, name, phone, active)
