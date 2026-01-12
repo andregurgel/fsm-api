@@ -31,7 +31,7 @@ public class GroupService {
     public Group findById(Long groupId) {
         Optional<Group> groupOpt = groupRepository.findById(groupId);
         if (groupOpt.isEmpty()) {
-            throw new ApplicationException(messageService.get("group.creation.limit.exceeded.exception"));
+            throw new ApplicationException(messageService.get("group.not.found.exception", groupId));
         }
 
         return groupOpt.get();
@@ -68,7 +68,7 @@ public class GroupService {
     private void verifyIfUserCanCreateGroup(Long ownerId) {
         List<Group> groups = groupRepository.findAllByOwner_Id(ownerId);
         if (groups.size() == 2) {
-            throw new RuntimeException(messageService.get("group.already.created.exception", ownerId));
+            throw new RuntimeException(messageService.get("group.creation.limit.exceeded.exception"));
         }
     }
 }

@@ -1,11 +1,9 @@
 package dev.andregurgel.fsm_api.repository.spec;
 
-import dev.andregurgel.fsm_api.commons.infrastructure.util.SpecificationUtils;
 import dev.andregurgel.fsm_api.controller.filter.GroupInviteFilter;
 import dev.andregurgel.fsm_api.model.GroupInvite;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
