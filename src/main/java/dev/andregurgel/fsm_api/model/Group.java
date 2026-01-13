@@ -1,5 +1,6 @@
 package dev.andregurgel.fsm_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,10 @@ public class Group {
     )
     @JsonIncludeProperties({"id", "name"})
     private Set<User> users = new HashSet<>();
+
+    @JsonIgnoreProperties({"group"})
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Vehicle> vehicles = new HashSet<>();
 
     @PrePersist
     private void prePersist() {

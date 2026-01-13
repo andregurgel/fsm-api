@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ErrorResponse> handleApplicationException(
-            RuntimeException ex,
+            ApplicationException ex,
             HttpServletRequest req
     ) {
         ErrorResponse body = ErrorResponse.builder()

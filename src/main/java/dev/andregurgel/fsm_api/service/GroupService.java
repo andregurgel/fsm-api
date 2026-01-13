@@ -1,10 +1,12 @@
 package dev.andregurgel.fsm_api.service;
 
 import dev.andregurgel.fsm_api.commons.exception.ApplicationException;
-import dev.andregurgel.fsm_api.controller.dto.GroupInserRecord;
+import dev.andregurgel.fsm_api.controller.dto.GroupInsertRecord;
+import dev.andregurgel.fsm_api.controller.dto.GroupPatchRecord;
 import dev.andregurgel.fsm_api.model.Group;
 import dev.andregurgel.fsm_api.model.User;
 import dev.andregurgel.fsm_api.repository.GroupRepository;
+import dev.andregurgel.fsm_api.service.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +20,17 @@ public class GroupService {
 
     private final UserService userService;
 
+    private final GroupMapper groupMapper;
+
     private final MessageService messageService;
 
     public GroupService(GroupRepository groupRepository,
                         UserService userService,
+                        GroupMapper groupMapper,
                         MessageService messageService) {
         this.groupRepository = groupRepository;
         this.userService = userService;
+        this.groupMapper = groupMapper;
         this.messageService = messageService;
     }
 
@@ -45,17 +51,24 @@ public class GroupService {
     }
 
     @Transactional
-    public Group insert(GroupInserRecord groupInserRecord) {
-        verifyIfUserCanCreateGroup(groupInserRecord.ownerId());
+    public Group insert(GroupInsertRecord groupInsertRecord) {
+        verifyIfUserCanCreateGroup(groupInsertRecord.ownerId());
 
-        User owner = userService.findById(groupInserRecord.ownerId());
+        User owner = userService.findById(groupInsertRecord.ownerId());
 
         Group group = new Group();
-        group.setName(groupInserRecord.name());
+        group.setName(groupInsertRecord.name());
         group.setOwner(owner);
 
         group.getUsers().add(owner);
 
+        return groupRepository.save(group);
+    }
+
+    @Transactional
+    public Group patch(Long id, GroupPatchRecord groupPatchRecord) {
+        Group group = findById(id);
+        groupMapper.patch(groupPatchRecord, group);
         return groupRepository.save(group);
     }
 
