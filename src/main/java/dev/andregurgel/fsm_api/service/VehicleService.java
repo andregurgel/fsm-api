@@ -40,7 +40,7 @@ public class VehicleService {
     public Vehicle findById(Long id) {
         Optional<Vehicle> vehicleOpt = vehicleRepository.findById(id);
         if (vehicleOpt.isEmpty()) {
-            throw new ApplicationException(messageService.get("vehicle.not.found.exception"));
+            throw new ApplicationException(messageService.get("vehicle.not.found.exception", id));
         }
 
         return vehicleOpt.get();
