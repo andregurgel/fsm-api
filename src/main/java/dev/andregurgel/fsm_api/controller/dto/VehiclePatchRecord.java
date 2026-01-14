@@ -1,10 +1,10 @@
 package dev.andregurgel.fsm_api.controller.dto;
 
-import dev.andregurgel.fsm_api.model.enums.TypeEnum;
+import dev.andregurgel.fsm_api.model.enums.VehicleTypeEnum;
 
 public record VehiclePatchRecord(
         String description,
-        TypeEnum type,
+        VehicleTypeEnum type,
         String plate
 ) {
 }

@@ -1,6 +1,6 @@
 package dev.andregurgel.fsm_api.model.enums;
 
-public enum TypeEnum {
+public enum VehicleTypeEnum {
     CAR,
     MOTORCYCLE
 }

@@ -1,11 +1,16 @@
 package dev.andregurgel.fsm_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import dev.andregurgel.fsm_api.model.enums.TypeEnum;
+import dev.andregurgel.fsm_api.model.enums.VehicleTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,13 +28,17 @@ public class Vehicle {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private TypeEnum type;
+    private VehicleTypeEnum type;
 
     private String plate;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "group_id", nullable = false)
-    @JsonIncludeProperties({"id", "name"})
+    @JsonIgnore
     private Group group;
+
+    @JsonIgnoreProperties({"vehicle"})
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Supply> supplies = new HashSet<>();
 }
