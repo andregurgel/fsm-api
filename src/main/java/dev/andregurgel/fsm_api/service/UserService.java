@@ -10,6 +10,7 @@ import dev.andregurgel.fsm_api.repository.spec.UserSpecification;
 import dev.andregurgel.fsm_api.service.mapper.UserMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,14 +21,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
     private final MessageService messageService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
-                       UserMapper userMapper, MessageService messageService) {
+                       UserMapper userMapper,
+                       MessageService messageService,
+                       BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.messageService = messageService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public User findById(Long id) {
@@ -51,8 +55,8 @@ public class UserService {
         User user = new User();
         user.setName(userInsertRecord.name());
         user.setEmail(userInsertRecord.email());
-        user.setPassword(userInsertRecord.password());
-        user.setPhone(userInsertRecord.phone()); // TODO: Include bCrypt when implementing security.
+        user.setPassword(bCryptPasswordEncoder.encode(userInsertRecord.password()));
+        user.setPhone(userInsertRecord.phone());
         user.setActive(true);
         return userRepository.save(user);
     }
