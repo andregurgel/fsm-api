@@ -1,0 +1,9 @@
+ALTER TABLE public.supply
+ADD COLUMN user_id BIGINT NOT NULL;
+
+ALTER TABLE public.supply
+ADD CONSTRAINT fk_supply_user
+FOREIGN KEY (user_id)
+REFERENCES public."user" (id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;

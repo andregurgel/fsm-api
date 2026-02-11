@@ -16,7 +16,27 @@ public class SupplySpecification {
 
             predicates.add(cb.equal(root.get("deleted"), false));
 
-            query.orderBy(cb.desc(root.get("createdAt")));
+            if (filter.getGroupId() != null) {
+                predicates.add(cb.equal(root.get("vehicle").get("group").get("id"), filter.getGroupId()));
+            }
+
+            if (filter.getVehicleId() != null) {
+                predicates.add(cb.equal(root.get("vehicle").get("id"), filter.getVehicleId()));
+            }
+
+            if (filter.getUserId() != null) {
+                predicates.add(cb.equal(root.get("user").get("id"), filter.getUserId()));
+            }
+
+            if (filter.getStartDate() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("suppliedAt"), filter.getStartDate()));
+            }
+
+            if (filter.getEndDate() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("suppliedAt"), filter.getEndDate()));
+            }
+
+            query.orderBy(cb.desc(root.get("suppliedAt")));
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

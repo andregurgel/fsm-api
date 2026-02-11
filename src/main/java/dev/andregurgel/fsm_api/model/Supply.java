@@ -1,6 +1,5 @@
 package dev.andregurgel.fsm_api.model;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import dev.andregurgel.fsm_api.model.enums.SupplyTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +21,6 @@ public class Supply {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull
     private BigDecimal liter;
 
     @NotNull
@@ -53,6 +51,11 @@ public class Supply {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @PrePersist
     private void prePersist() {

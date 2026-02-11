@@ -1,8 +1,8 @@
 CREATE TABLE public.supply
 (
     id              UUID PRIMARY KEY NOT NULL,
-    liter           DECIMAL(10, 2)   NOT NULL,
     price           DECIMAL(10, 2)   NOT NULL,
+    liter           DECIMAL(10, 2),
     current_mileage INTEGER,
     type            VARCHAR(32)      NOT NULL,
     supplied_at     TIMESTAMP        NOT NULL,
